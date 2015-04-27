@@ -1,0 +1,50 @@
+@echo off
+set rootpath=C:\RawHelpDesk\
+set pathsubs=%rootpath%subs\
+set pathtxt=%rootpath%txt\
+:run
+cls
+SET /P usr=Please enter the username you wish to work with:
+cls
+echo			           %usr%
+echo 	1 - Password Reset to Default (topoil123)
+echo 	2 - Set new custom password              
+echo 	3 - Unlock Account
+echo 	4 - Group
+echo 	5 - Citrix Session
+set /p opt= Select an option:
+if %opt% == 1 goto :def
+if %opt% == 2 goto :set
+if %opt% == 3 goto :unlock
+if %opt% == 4 goto :group
+if %opt% == 5 goto :citrix
+ 	:set
+		RUNAS /USER:TOPADMIN@TOP.IE "net user %usr% * /DOMAIN"
+		cls
+		echo New password set succesfully 
+		for %usr%!
+		goto :end
+	
+	:unlock
+		runas /user:topadmin@top.ie "dsmod user \"%usr%\" -disable no
+		cls
+		echo Account unlocked for %usr%!
+		goto :end
+	
+	:def
+		rem this line will reset it automaticaly to "topoil123"
+		RUNAS /USER:TOPADMIN@TOP.IE "net user %usr% topoil123 /DOMAIN"
+		cls
+		echo Password reset to topoil123 succesfully for %usr%!
+		goto :end
+	
+	:group	
+		RUNAS /USER:TOPADMIN@TOP.IE "%pathsubs%ADGroupModifier.bat %usr%"
+		cls
+	:citrix
+		RUNAS /USER:TOPADMIN@TOP.IE "%pathsubs%ResetCitrixSession.bat %usr% %pathtxt% "
+		cls
+	:end
+Set /p up=Run again?
+if %up% == y goto :run
+exit
